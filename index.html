@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafCam - Construction Safety Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SC</div>
+                <h1>SafCam</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Initializing...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Camera Feed -->
+            <section class="camera-section">
+                <div class="card camera-card">
+                    <div class="card-header">
+                        <h2>Live Camera Feed</h2>
+                        <div class="scan-interval">
+                            <span>Scan: 0.5s</span>
+                        </div>
+                    </div>
+                    <div class="camera-container">
+                        <video id="videoElement" autoplay playsinline></video>
+                        <canvas id="canvasElement"></canvas>
+                        <div class="detection-overlay" id="detectionOverlay"></div>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="startBtn" class="btn btn-primary">
+                            <span>▶</span> Start Monitoring
+                        </button>
+                        <button id="stopBtn" class="btn btn-secondary" disabled>
+                            <span>⏸</span> Stop
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Panel -->
+                <div class="alert-panel" id="alertPanel">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <h3>Safety Violation Detected!</h3>
+                        <p id="alertMessage">Checking compliance...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel - Stats & Logs -->
+            <section class="info-section">
+                <!-- Statistics -->
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <h2>Statistics</h2>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalScans">0</div>
+                            <div class="stat-label">Total Scans</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalViolations">0</div>
+                            <div class="stat-label">Violations</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="complianceRate">100%</div>
+                            <div class="stat-label">Compliance</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Violation Log -->
+                <div class="card log-card">
+                    <div class="card-header">
+                        <h2>Violation Log</h2>
+                        <button id="clearBtn" class="btn btn-small">Clear</button>
+                    </div>
+                    <div class="log-container" id="logContainer">
+                        <div class="log-empty">No violations detected</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
