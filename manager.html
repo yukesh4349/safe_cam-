@@ -4,84 +4,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafCam - Construction Site Manager Portal</title>
+    <title>SafCam Enterprise - Command & Manager Operations</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Top App Header -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">🏗️</div>
                 <div>
-                    <h1>SafCam Manager Portal</h1>
-                    <div style="font-size: 0.85rem; opacity: 0.7; font-weight: 500;">Multi-Camera CCTV Operations & Workforce Compliance</div>
+                    <h1>SafCam Command Center</h1>
+                    <div style="font-size: 0.8rem; color: var(--muted); font-weight: 500;">
+                        AI CCTV Operations • Site Blueprint Studio • Workforce Safety
+                    </div>
                 </div>
             </div>
             <div class="header-actions">
-                <div class="header-clock" id="liveClock">--:--:-- UTC</div>
-                <button class="btn btn-emergency" id="broadcastModalBtn">
-                    📢 Site Broadcast
+                <div class="header-clock" id="liveClock">--:--:-- SITE TIME</div>
+                <button class="btn btn-emergency" id="openBroadcastModalBtn">
+                    📢 Site PA Broadcast
                 </button>
                 <a href="/" class="btn btn-secondary">
-                    🖥️ Live Single Monitor
+                    🖥️ Live Single Cam
                 </a>
             </div>
         </header>
 
-        <!-- Main Stats Overview -->
+        <!-- Master KPI Stat Cards -->
         <section class="stats-section">
-            <div class="card stats-card">
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value" id="totalWorkers">0</div>
-                        <div class="stat-label">Total Workforce</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="activeCamerasCount">6/6</div>
-                        <div class="stat-label">CCTV Cameras Online</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="activeZonesCount">5</div>
-                        <div class="stat-label">Active Safety Zones</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="totalWorkerViolations">0</div>
-                        <div class="stat-label">Total Site Violations</div>
-                    </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalWorkers">0</div>
+                    <div class="stat-label">Total Workforce</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeCamerasCount">6/6</div>
+                    <div class="stat-label">CCTV Feeds Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeZonesCount">5</div>
+                    <div class="stat-label">Safety Sectors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalWorkerViolations">0</div>
+                    <div class="stat-label">Total Site Violations</div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 1: Multi-Camera CCTV Grid -->
-        <section class="cctv-section">
+        <!-- Modern Tabbed Navigation -->
+        <nav class="manager-nav-tabs">
+            <button class="nav-tab-btn active" data-tab="cctv-tab">
+                📹 CCTV Operations Matrix
+            </button>
+            <button class="nav-tab-btn" data-tab="blueprint-tab">
+                🗺️ Site Blueprint & Camera Map
+            </button>
+            <button class="nav-tab-btn" data-tab="zones-tab">
+                🛡️ Zone Safety Protocols
+            </button>
+            <button class="nav-tab-btn" data-tab="workforce-tab">
+                👷 Workforce & Clearance
+            </button>
+            <button class="nav-tab-btn" data-tab="analytics-tab">
+                📊 Safety Analytics & Reports
+            </button>
+        </nav>
+
+        <!-- ==================== TAB 1: CCTV COMMAND MATRIX ==================== -->
+        <section id="cctv-tab" class="tab-panel active">
             <div class="section-toolbar">
-                <h2>📹 Multi-Camera CCTV Operations Grid</h2>
+                <h2>📹 Multi-Camera CCTV Matrix</h2>
                 <div class="toolbar-actions">
-                    <button id="startAllCamerasBtn" class="btn btn-primary btn-small">
-                        ▶ Start All Feeds
-                    </button>
-                    <button id="stopAllCamerasBtn" class="btn btn-secondary btn-small">
-                        ⏸ Stop All Feeds
-                    </button>
+                    <select id="cameraDeviceSelect" class="filter-select" title="Select Video Device">
+                        <option value="">Default Web Camera</option>
+                    </select>
                     <select id="cameraZoneFilter" class="filter-select">
-                        <option value="all">All Zones (6 Cameras)</option>
+                        <option value="all">All Sectors (6 Cameras)</option>
                         <option value="zone-a">Zone A (CAM 01, CAM 02)</option>
                         <option value="zone-b">Zone B (CAM 03)</option>
                         <option value="zone-c">Zone C (CAM 04)</option>
                         <option value="zone-d">Zone D (CAM 05)</option>
                         <option value="zone-e">Zone E (CAM 06)</option>
                     </select>
+                    <button id="startAllCamerasBtn" class="btn btn-primary btn-small">
+                        ▶ Start All Feeds
+                    </button>
+                    <button id="stopAllCamerasBtn" class="btn btn-secondary btn-small">
+                        ⏸ Stop All Feeds
+                    </button>
                 </div>
             </div>
 
             <div class="cctv-grid" id="cctvGrid">
-                <!-- CAM 01: Main Gate / Check-in (WebRTC Live Stream) -->
+                <!-- CAM 01: Main Gate / Primary WebRTC Feed -->
                 <div class="cctv-card" id="camCard1" data-zone="zone-a">
                     <div class="cctv-header">
                         <div class="cctv-title">
@@ -93,26 +114,26 @@
                         <video id="videoElementManager" class="cctv-video" autoplay playsinline muted></video>
                         <canvas id="canvasElementManager" class="cctv-canvas" style="display: none;"></canvas>
                         <div class="cctv-overlay-telemetry">
-                            <div class="rec-badge" id="cam1RecBadge"><span class="rec-dot"></span> LIVE REC</div>
+                            <div class="rec-badge idle-rec" id="cam1RecBadge"><span class="rec-dot"></span> LIVE REC</div>
                             <div class="cctv-specs" id="cam1Specs">1280x720 | 30 FPS</div>
                         </div>
                         <div class="cctv-ai-hud">
-                            <span class="cctv-status-badge status-idle-badge" id="cam1StatusBadge">Ready</span>
+                            <span class="cctv-status-badge status-idle-badge" id="cam1StatusBadge">Standby</span>
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info" id="cam1Info">Primary AI Stream</div>
-                        <button class="cctv-controls-btn cctv-start-btn" id="cam1ToggleBtn" onclick="toggleCamera(1)">
-                            Start Stream
+                        <div class="cctv-info">Primary AI Vision Stream</div>
+                        <button class="cctv-controls-btn cctv-start-btn" id="cam1ToggleBtn" onclick="toggleCam1Stream()">
+                            Start Camera
                         </button>
                     </div>
                 </div>
 
-                <!-- CAM 02: Zone A - Structural Framework -->
+                <!-- CAM 02: Structural Tower Framework -->
                 <div class="cctv-card" id="camCard2" data-zone="zone-a">
                     <div class="cctv-header">
                         <div class="cctv-title">
-                            <span>🎥 CAM-02: Structural Framework</span>
+                            <span>🎥 CAM-02: Structural Tower</span>
                         </div>
                         <span class="cctv-zone-tag zone-a-tag">Zone A</span>
                     </div>
@@ -127,14 +148,14 @@
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info">Scaffolding & Rigging</div>
+                        <div class="cctv-info">Core Columns & Scaffolding</div>
                         <button class="cctv-controls-btn cctv-stop-btn" id="cam2ToggleBtn" onclick="toggleSimCamera(2)">
                             Pause
                         </button>
                     </div>
                 </div>
 
-                <!-- CAM 03: Zone B - Heavy Machinery Bay -->
+                <!-- CAM 03: Heavy Machinery Bay -->
                 <div class="cctv-card" id="camCard3" data-zone="zone-b">
                     <div class="cctv-header">
                         <div class="cctv-title">
@@ -153,14 +174,14 @@
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info">Cranes & Excavators</div>
+                        <div class="cctv-info">Tower Cranes & Excavators</div>
                         <button class="cctv-controls-btn cctv-stop-btn" id="cam3ToggleBtn" onclick="toggleSimCamera(3)">
                             Pause
                         </button>
                     </div>
                 </div>
 
-                <!-- CAM 04: Zone C - Deep Excavation Pit -->
+                <!-- CAM 04: Excavation Pit -->
                 <div class="cctv-card" id="camCard4" data-zone="zone-c">
                     <div class="cctv-header">
                         <div class="cctv-title">
@@ -179,18 +200,18 @@
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info">Pit & Foundation</div>
+                        <div class="cctv-info">Basement Trench Shoring</div>
                         <button class="cctv-controls-btn cctv-stop-btn" id="cam4ToggleBtn" onclick="toggleSimCamera(4)">
                             Pause
                         </button>
                     </div>
                 </div>
 
-                <!-- CAM 05: Zone D - Material Loading & Storage -->
+                <!-- CAM 05: Logistics Depot -->
                 <div class="cctv-card" id="camCard5" data-zone="zone-d">
                     <div class="cctv-header">
                         <div class="cctv-title">
-                            <span>🎥 CAM-05: Logistics & Storage</span>
+                            <span>🎥 CAM-05: Logistics Depot</span>
                         </div>
                         <span class="cctv-zone-tag zone-d-tag">Zone D</span>
                     </div>
@@ -205,14 +226,14 @@
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info">Loading & Forklift Bay</div>
+                        <div class="cctv-info">Material Stockpile & Forklifts</div>
                         <button class="cctv-controls-btn cctv-stop-btn" id="cam5ToggleBtn" onclick="toggleSimCamera(5)">
                             Pause
                         </button>
                     </div>
                 </div>
 
-                <!-- CAM 06: Zone E - Workshop & Fabrication -->
+                <!-- CAM 06: Fabrication Bay -->
                 <div class="cctv-card" id="camCard6" data-zone="zone-e">
                     <div class="cctv-header">
                         <div class="cctv-title">
@@ -231,7 +252,7 @@
                         </div>
                     </div>
                     <div class="cctv-footer">
-                        <div class="cctv-info">Welding & Assembly</div>
+                        <div class="cctv-info">Welding & Metal Assembly</div>
                         <button class="cctv-controls-btn cctv-stop-btn" id="cam6ToggleBtn" onclick="toggleSimCamera(6)">
                             Pause
                         </button>
@@ -240,118 +261,107 @@
             </div>
         </section>
 
-        <!-- Section 2: Zone Safety Matrix & Protocols -->
-        <section class="zones-section">
+        <!-- ==================== TAB 2: SITE BLUEPRINT & MAP STUDIO ==================== -->
+        <section id="blueprint-tab" class="tab-panel">
             <div class="section-toolbar">
-                <h2>🛡️ Site Zones & Safety Protocols Matrix</h2>
+                <h2>🗺️ Site Blueprint Studio & Camera Pin Positioning</h2>
+                <div class="toolbar-actions">
+                    <button id="saveMapPinsBtn" class="btn btn-primary btn-small">💾 Save Pin Positions</button>
+                    <button id="resetMapPinsBtn" class="btn btn-secondary btn-small">↺ Reset Pins</button>
+                </div>
             </div>
-            <div class="zones-grid">
-                <div class="zone-card">
-                    <div class="zone-card-header">
-                        <div>
-                            <div class="zone-title">Zone A: Structural Framework</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">Main Tower & Check-in</div>
-                        </div>
-                        <span class="zone-risk-pill risk-high">High Risk</span>
-                    </div>
-                    <div class="zone-ppe-list">
-                        <span class="ppe-chip">⛑️ Safety Helmet</span>
-                        <span class="ppe-chip">🦺 High-Vis Vest</span>
-                        <span class="ppe-chip">🥾 Safety Boots</span>
-                    </div>
-                    <div class="zone-stats-row">
-                        <span>Cameras: <strong>CAM-01, CAM-02</strong></span>
-                        <span id="zoneAWorkers">Workers: <strong>0</strong></span>
-                    </div>
-                </div>
 
-                <div class="zone-card">
-                    <div class="zone-card-header">
-                        <div>
-                            <div class="zone-title">Zone B: Heavy Machinery Bay</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">Crane & Excavator Lane</div>
-                        </div>
-                        <span class="zone-risk-pill risk-critical">Critical Risk</span>
-                    </div>
-                    <div class="zone-ppe-list">
-                        <span class="ppe-chip">⛑️ Hard Hat</span>
-                        <span class="ppe-chip">🦺 High-Vis Vest</span>
-                        <span class="ppe-chip">🎧 Ear Protection</span>
-                    </div>
-                    <div class="zone-stats-row">
-                        <span>Cameras: <strong>CAM-03</strong></span>
-                        <span id="zoneBWorkers">Workers: <strong>0</strong></span>
-                    </div>
-                </div>
+            <div class="blueprint-card">
+                <div class="blueprint-layout">
+                    <!-- Interactive Blueprint Canvas Stage -->
+                    <div class="blueprint-stage" id="blueprintStage">
+                        <img id="blueprintMapImg" class="blueprint-bg-img" src="" alt="Site Blueprint" style="display: none;">
+                        <div class="blueprint-vector-grid" id="blueprintDefaultGrid"></div>
 
-                <div class="zone-card">
-                    <div class="zone-card-header">
-                        <div>
-                            <div class="zone-title">Zone C: Excavation Pit</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">Foundation Trench</div>
+                        <!-- Draggable Camera Pins -->
+                        <div class="camera-map-pin" id="pin-cam1" data-id="cam1" style="left: 18.5%; top: 82%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-01 (Main Gate)</div>
                         </div>
-                        <span class="zone-risk-pill risk-high">High Risk</span>
+                        <div class="camera-map-pin" id="pin-cam2" data-id="cam2" style="left: 35%; top: 28%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-02 (Tower)</div>
+                        </div>
+                        <div class="camera-map-pin" id="pin-cam3" data-id="cam3" style="left: 68%; top: 32%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-03 (Machinery)</div>
+                        </div>
+                        <div class="camera-map-pin" id="pin-cam4" data-id="cam4" style="left: 78%; top: 72%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-04 (Excavation)</div>
+                        </div>
+                        <div class="camera-map-pin" id="pin-cam5" data-id="cam5" style="left: 42%; top: 75%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-05 (Logistics)</div>
+                        </div>
+                        <div class="camera-map-pin" id="pin-cam6" data-id="cam6" style="left: 22%; top: 45%;">
+                            <span>📹</span>
+                            <div class="pin-label">CAM-06 (Workshop)</div>
+                        </div>
                     </div>
-                    <div class="zone-ppe-list">
-                        <span class="ppe-chip">⛑️ Hard Hat</span>
-                        <span class="ppe-chip">🦺 High-Vis Vest</span>
-                        <span class="ppe-chip">🧗 Full Body Harness</span>
-                    </div>
-                    <div class="zone-stats-row">
-                        <span>Cameras: <strong>CAM-04</strong></span>
-                        <span id="zoneCWorkers">Workers: <strong>0</strong></span>
-                    </div>
-                </div>
 
-                <div class="zone-card">
-                    <div class="zone-card-header">
-                        <div>
-                            <div class="zone-title">Zone D: Logistics Depot</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">Material Storage & Loading</div>
-                        </div>
-                        <span class="zone-risk-pill risk-medium">Medium Risk</span>
-                    </div>
-                    <div class="zone-ppe-list">
-                        <span class="ppe-chip">⛑️ Hard Hat</span>
-                        <span class="ppe-chip">🦺 High-Vis Vest</span>
-                        <span class="ppe-chip">🧤 Work Gloves</span>
-                    </div>
-                    <div class="zone-stats-row">
-                        <span>Cameras: <strong>CAM-05</strong></span>
-                        <span id="zoneDWorkers">Workers: <strong>0</strong></span>
-                    </div>
-                </div>
+                    <!-- Blueprint Studio Sidebar -->
+                    <div class="blueprint-sidebar">
+                        <h3 style="font-size: 0.95rem; font-weight: 700;">Blueprint Controls</h3>
+                        <p style="font-size: 0.8rem; color: var(--muted);">
+                            Upload your site floor plan or CAD diagram. Drag camera pins across the map to match their physical installation points.
+                        </p>
 
-                <div class="zone-card">
-                    <div class="zone-card-header">
-                        <div>
-                            <div class="zone-title">Zone E: Workshop & Fabrication</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">Welding & Metal Assembly</div>
+                        <!-- Upload Blueprint Map -->
+                        <div class="map-upload-dropzone" id="mapUploadDropzone">
+                            <input type="file" id="mapFileInput" accept="image/*" style="display: none;">
+                            <div style="font-size: 1.6rem; margin-bottom: 4px;">📐</div>
+                            <div style="font-weight: 600; font-size: 0.85rem;">Upload Site Blueprint</div>
+                            <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">PNG, JPG, SVG or CAD export</div>
                         </div>
-                        <span class="zone-risk-pill risk-medium">Medium Risk</span>
-                    </div>
-                    <div class="zone-ppe-list">
-                        <span class="ppe-chip">🥽 Eye Goggles</span>
-                        <span class="ppe-chip">⛑️ Hard Hat</span>
-                        <span class="ppe-chip">🧤 Heat Gloves</span>
-                    </div>
-                    <div class="zone-stats-row">
-                        <span>Cameras: <strong>CAM-06</strong></span>
-                        <span id="zoneEWorkers">Workers: <strong>0</strong></span>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button id="clearCustomMapBtn" class="btn btn-secondary btn-small" style="width: 100%;">
+                                Use Default Blueprint Grid
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Workforce & Employee Management Layout -->
-        <section class="workers-section">
+        <!-- ==================== TAB 3: DYNAMIC ZONE CONFIGURATION ==================== -->
+        <section id="zones-tab" class="tab-panel">
             <div class="section-toolbar">
-                <h2>👷 Workforce & Employee Management Console</h2>
-                <button id="refreshBtn" class="btn btn-secondary btn-small">🔄 Sync Data</button>
+                <h2>🛡️ Safety Sectors & Protocol Enforcement</h2>
+                <div class="toolbar-actions">
+                    <button id="openAddZoneModalBtn" class="btn btn-primary btn-small">
+                        ➕ Create Custom Zone
+                    </button>
+                </div>
+            </div>
+
+            <div class="zones-grid" id="zonesGridContainer">
+                <!-- Dynamically rendered via manager.js -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: WORKFORCE ROSTER ==================== -->
+        <section id="workforce-tab" class="tab-panel">
+            <div class="section-toolbar">
+                <h2>👷 Workforce Roster & PPE Clearance</h2>
+                <div class="toolbar-actions">
+                    <button id="exportWorkersCsvBtn" class="btn btn-secondary btn-small">
+                        📥 Export Personnel CSV
+                    </button>
+                    <button id="refreshWorkersBtn" class="btn btn-secondary btn-small">
+                        🔄 Sync Roster
+                    </button>
+                </div>
             </div>
 
             <div class="worker-management-layout">
-                <!-- Register Employee Form -->
+                <!-- Registration Card -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Register Personnel</h2>
@@ -359,14 +369,14 @@
                     <form id="addWorkerForm" class="worker-form">
                         <div class="form-group">
                             <label for="workerName">Full Name *</label>
-                            <input type="text" id="workerName" required placeholder="e.g., John Smith">
+                            <input type="text" id="workerName" required placeholder="e.g., Alex Johnson">
                         </div>
                         <div class="form-group">
                             <label for="employeeId">Employee ID *</label>
-                            <input type="text" id="employeeId" required placeholder="e.g., EMP-104">
+                            <input type="text" id="employeeId" required placeholder="e.g., EMP-105">
                         </div>
                         <div class="form-group">
-                            <label for="workerRole">Role / Job Classification *</label>
+                            <label for="workerRole">Role / Classification</label>
                             <select id="workerRole">
                                 <option value="General Worker">General Worker</option>
                                 <option value="Site Supervisor">Site Safety Supervisor</option>
@@ -378,7 +388,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="workerZone">Assigned Work Zone *</label>
+                            <label for="workerZone">Assigned Work Zone</label>
                             <select id="workerZone">
                                 <option value="Zone A - Structural Framework">Zone A - Structural Framework</option>
                                 <option value="Zone B - Heavy Machinery Bay">Zone B - Heavy Machinery Bay</option>
@@ -388,31 +398,31 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="workerPhone">Emergency Contact / Phone</label>
-                            <input type="tel" id="workerPhone" placeholder="e.g., +1 (555) 019-2834">
+                            <label for="workerPhone">Emergency Contact Phone</label>
+                            <input type="tel" id="workerPhone" placeholder="+1 (555) 019-2834">
                         </div>
                         <div class="form-group">
                             <label for="workerClearance">Safety Clearance Status</label>
                             <select id="workerClearance">
-                                <option value="Certified">Certified / Approved</option>
+                                <option value="Certified">Certified / PPE Approved</option>
                                 <option value="Pending Inspection">Pending PPE Review</option>
                                 <option value="Flagged">Flagged for Safety Training</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                            ➕ Register Employee
+                        <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+                            ➕ Register Personnel
                         </button>
                     </form>
                 </div>
 
-                <!-- Registered Workers Table -->
+                <!-- Workforce Table Card -->
                 <div class="card">
                     <div class="card-header">
-                        <h2>Workforce Roster</h2>
+                        <h2>Workforce Directory</h2>
                     </div>
                     
                     <div class="table-filter-bar">
-                        <input type="text" id="tableSearchInput" class="search-input" placeholder="🔍 Search by name or ID...">
+                        <input type="text" id="tableSearchInput" class="search-input" placeholder="🔍 Search by name or employee ID...">
                         <select id="roleFilterSelect" class="filter-select">
                             <option value="all">All Roles</option>
                             <option value="General Worker">General Worker</option>
@@ -455,33 +465,104 @@
                 </div>
             </div>
         </section>
+
+        <!-- ==================== TAB 5: SAFETY ANALYTICS & REPORTS ==================== -->
+        <section id="analytics-tab" class="tab-panel">
+            <div class="section-toolbar">
+                <h2>📊 Safety Compliance Analytics & Audit Reports</h2>
+                <div class="toolbar-actions">
+                    <button id="downloadReportJsonBtn" class="btn btn-primary btn-small">
+                        📄 Download Full Audit Report (JSON)
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Live Incident & Violation Timeline</h2>
+                </div>
+                <div class="log-container" id="managerLogContainer">
+                    <div class="log-empty">No violation incidents recorded yet.</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Site Broadcast Emergency Modal -->
+    <!-- Emergency PA Voice Broadcast Modal -->
     <div class="modal-overlay" id="broadcastModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>📢 Site-Wide Voice Announcement Broadcast</h3>
+                <h3>📢 Site-Wide PA Voice Broadcast</h3>
                 <button class="modal-close" id="closeBroadcastModal">&times;</button>
             </div>
             <form id="broadcastForm">
-                <div class="form-group" style="margin-bottom: 15px;">
+                <div class="form-group" style="margin-bottom: 14px;">
                     <label for="broadcastPreset">Announcement Presets</label>
                     <select id="broadcastPreset">
                         <option value="custom">Custom Message...</option>
-                        <option value="Attention all personnel! Mandatory PPE inspection in progress. Verify your safety helmet and high-visibility vest immediately.">Mandatory PPE Check</option>
+                        <option value="Attention all personnel on site! Mandatory PPE safety inspection in progress. Verify your safety helmet and high-visibility vest immediately.">Mandatory PPE Check</option>
                         <option value="Attention! Severe weather warning in effect. Secure all scaffolding and report to safety muster stations.">Severe Weather Warning</option>
                         <option value="Attention all zones! Heavy machinery moving through Zone B and Zone D. Clear all transport corridors.">Heavy Equipment Movement</option>
-                        <option value="Attention! All safety inspections complete. Site operations may proceed.">All Clear Announcement</option>
+                        <option value="Attention all personnel! All safety inspections complete. Normal site operations may proceed.">All Clear Announcement</option>
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="broadcastMessage">Broadcast Message</label>
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label for="broadcastMessage">Broadcast Voice Message</label>
                     <textarea id="broadcastMessage" rows="4" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-family: 'Inter', sans-serif; resize: none;" required placeholder="Type custom voice announcement..."></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" class="btn btn-secondary" id="cancelBroadcastBtn">Cancel</button>
                     <button type="submit" class="btn btn-emergency">🔊 Broadcast Over PA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Zone Configurator Modal -->
+    <div class="modal-overlay" id="zoneConfigModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="zoneModalTitle">➕ Configure Safety Zone</h3>
+                <button class="modal-close" id="closeZoneModal">&times;</button>
+            </div>
+            <form id="zoneConfigForm">
+                <input type="hidden" id="zoneConfigId">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="zoneConfigName">Zone Name *</label>
+                    <input type="text" id="zoneConfigName" required placeholder="e.g., Zone F - Solar Array Sector">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="zoneConfigCode">Sector Code *</label>
+                    <input type="text" id="zoneConfigCode" required placeholder="e.g., SEC-F6">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="zoneConfigDesc">Description / Operation Details</label>
+                    <input type="text" id="zoneConfigDesc" placeholder="e.g., High-voltage inverter installation">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="zoneConfigRisk">Risk Classification</label>
+                    <select id="zoneConfigRisk">
+                        <option value="Critical">Critical Risk</option>
+                        <option value="High">High Risk</option>
+                        <option value="Medium">Medium Risk</option>
+                        <option value="Low">Low Risk</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Mandatory PPE Checklist</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; margin-top: 4px;">
+                        <label><input type="checkbox" id="ppeHelmet" checked> ⛑️ Safety Helmet</label>
+                        <label><input type="checkbox" id="ppeVest" checked> 🦺 High-Vis Vest</label>
+                        <label><input type="checkbox" id="ppeBoots" checked> 🥾 Safety Boots</label>
+                        <label><input type="checkbox" id="ppeHarness"> 🧗 Safety Harness</label>
+                        <label><input type="checkbox" id="ppeGoggles"> 🥽 Eye Protection</label>
+                        <label><input type="checkbox" id="ppeGloves"> 🧤 Work Gloves</label>
+                        <label><input type="checkbox" id="ppeEar"> 🎧 Ear Protection</label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" id="cancelZoneBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Zone</button>
                 </div>
             </form>
         </div>

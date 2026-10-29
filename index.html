@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -17,12 +17,22 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">
-                <div class="logo-icon">SC</div>
-                <h1>SafCam</h1>
+                <div class="logo-icon">🏗️</div>
+                <div>
+                    <h1>SafCam Live Monitor</h1>
+                    <div style="font-size: 0.8rem; color: var(--muted); font-weight: 500;">
+                        Single-Feed Optical Detection & Safety HUD
+                    </div>
+                </div>
             </div>
-            <div class="status-indicator" id="statusIndicator">
-                <span class="status-dot"></span>
-                <span class="status-text">Initializing...</span>
+            <div class="header-actions">
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Ready</span>
+                </div>
+                <a href="/manager" class="btn btn-primary" style="text-decoration: none;">
+                    🛠️ Manager Command Center
+                </a>
             </div>
         </header>
 
@@ -37,11 +47,48 @@
                             <span>Scan: 0.5s</span>
                         </div>
                     </div>
-                    <div class="camera-container">
-                        <video id="videoElement" autoplay playsinline></video>
+
+                    <!-- Fixed Aspect-Ratio Camera Container -->
+                    <div class="camera-container" id="cameraContainer">
+                        <video id="videoElement" autoplay playsinline muted></video>
                         <canvas id="canvasElement"></canvas>
-                        <div class="detection-overlay" id="detectionOverlay"></div>
+                        <!-- Live HUD Overlay Canvas for Bounding Boxes -->
+                        <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+
+                        <!-- In-Feed Live HUD Status -->
+                        <div class="feed-hud-top">
+                            <div class="feed-badge" id="feedBadge">
+                                <span class="feed-dot" id="feedDot"></span>
+                                <span id="feedStatusText">STANDBY</span>
+                            </div>
+                            <div class="feed-coords" id="feedCoords">CAM 01 // 1080p</div>
+                        </div>
+
+                        <!-- In-Feed Floating HUD Warning Ribbon -->
+                        <div class="feed-hud-banner" id="feedHudBanner">
+                            <span class="hud-banner-icon">⚠️</span>
+                            <span class="hud-banner-text" id="feedHudBannerText">SAFETY VIOLATION DETECTED</span>
+                        </div>
+
+                        <!-- Camera Standby / Offline Placeholder -->
+                        <div class="camera-placeholder" id="cameraPlaceholder">
+                            <div class="placeholder-graphic">
+                                <div class="radar-circle">
+                                    <div class="radar-scan"></div>
+                                    <span class="placeholder-cam-icon">📹</span>
+                                </div>
+                            </div>
+                            <h3 class="placeholder-title">OPTICAL SENSOR READY</h3>
+                            <p class="placeholder-desc">Click "Start Monitoring" below to activate real-time PPE detection</p>
+                            <!-- Viewfinder Corners -->
+                            <div class="corner-bracket corner-tl"></div>
+                            <div class="corner-bracket corner-tr"></div>
+                            <div class="corner-bracket corner-bl"></div>
+                            <div class="corner-bracket corner-br"></div>
+                        </div>
                     </div>
+
+                    <!-- Camera Controls -->
                     <div class="camera-controls">
                         <button id="startBtn" class="btn btn-primary">
                             <span>▶</span> Start Monitoring
@@ -50,14 +97,14 @@
                             <span>⏸</span> Stop
                         </button>
                     </div>
-                </div>
 
-                <!-- Alert Panel -->
-                <div class="alert-panel" id="alertPanel">
-                    <div class="alert-icon">⚠️</div>
-                    <div class="alert-content">
-                        <h3>Safety Violation Detected!</h3>
-                        <p id="alertMessage">Checking compliance...</p>
+                    <!-- Fixed Reserved Alert Panel (Inside Card to Prevent Layout Shift) -->
+                    <div class="alert-panel" id="alertPanel">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-content">
+                            <h3>Safety Violation Detected!</h3>
+                            <p id="alertMessage">Checking compliance...</p>
+                        </div>
                     </div>
                 </div>
             </section>

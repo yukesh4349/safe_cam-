@@ -16,6 +16,7 @@ class VoiceAlertSystem:
         self.last_announcement_time = 0  # Track last announcement time
         self.cooldown_seconds = 5  # Minimum seconds between announcements (5-6 seconds)
         self.beep_volume = 0.5  # Beep volume (50%)
+        self._speak_lock = threading.Lock()
         self._initialize_engine()
         
     def _initialize_engine(self):
@@ -81,6 +82,9 @@ class VoiceAlertSystem:
     
     def _speak_thread(self, text):
         """Thread function to play beep and speak text with thread-safe COM init"""
+        if not self._speak_lock.acquire(blocking=False):
+            return  # Skip if already speaking
+
         try:
             # Print the alert message
             print("=" * 80)
@@ -130,6 +134,8 @@ class VoiceAlertSystem:
             
         except Exception as e:
             print(f"Speech thread error: {e}")
+        finally:
+            self._speak_lock.release()
     
     def alert_violation(self, worker_name, violations):
         """

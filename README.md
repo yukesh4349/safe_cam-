@@ -1,4 +1,4 @@
-# 🏗️ SafCam - AI Construction Site Safety Monitoring System
+# 🏗️ SafCam Enterprise - AI Construction Site Safety & Command Center
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/framework-Flask%203.0-green.svg)](https://flask.palletsprojects.com/)
@@ -6,7 +6,7 @@
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini%20Vision-orange.svg)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
-**SafCam** is a high-performance, real-time computer vision safety monitoring system built for construction sites and industrial workspaces. It uses a **hybrid detection engine** combining local deep learning (**PyTorch YOLOv8**) with cloud-based **Google Gemini 1.5 Flash Vision** fallback to enforce mandatory Personal Protective Equipment (PPE) compliance, including **Safety Helmets (Hard Hats)** and **High-Visibility Safety Vests**.
+**SafCam** is an enterprise-grade, real-time computer vision safety monitoring and command center platform built for construction sites, industrial facilities, and engineering plants. Powered by a **hybrid detection engine** combining local deep learning (**PyTorch YOLOv8**) with cloud-based **Google Gemini 1.5 Flash Vision**, SafCam automates Personal Protective Equipment (PPE) compliance monitoring, site blueprint management, safety sector configuration, workforce clearance tracking, and emergency broadcasting.
 
 ---
 
@@ -19,9 +19,11 @@
 - [Configuration](#-configuration)
 - [Running SafCam](#-running-safcam)
 - [Dashboards & Portals](#-dashboards--portals)
-- [Detection Modes & Calibration](#-detection-modes--calibration)
-- [API Reference](#-api-reference)
-- [Project Structure](#-project-structure)
+  - [1. Single-Feed Live Optical Monitor](#1-single-feed-live-optical-monitor)
+  - [2. Enterprise Manager Command Center](#2-enterprise-manager-command-center)
+- [Detection Modes & Calibrations](#-detection-modes--calibrations)
+- [REST API Reference](#-rest-api-reference)
+- [Project Directory Structure](#-project-directory-structure)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
 
@@ -29,23 +31,28 @@
 
 ## 🎯 Key Features
 
-- ⚡ **Real-Time PPE Detection** – Evaluates live video streams every **0.5 seconds** with low latency.
-- 🔄 **Hybrid Detection Architecture**:
-  - **Primary**: Local **PyTorch YOLOv8** model for instant, privacy-first, zero-cost, offline-capable PPE analysis.
-  - **Fallback**: **Google Gemini 1.5 Flash Vision API** for high-accuracy contextual understanding.
-- 🦺 **Dual Safety Gear Verification**:
-  - **Safety Helmet / Hard Hat** detection (Yellow, Orange, White, Blue).
-  - **High-Visibility Safety Vest** detection (Orange, Yellow, Lime-Green).
-- 🔊 **Automated Voice & Audio Alerts**:
-  - Offline Text-to-Speech voice warnings using `pyttsx3`.
-  - Audible beep tones and browser notification alerts for immediate worker feedback.
-- 👷 **Worker Management & Tracking**:
-  - Dedicated Manager Portal (`/manager`) to register workers by ID and role.
-  - Per-worker violation logging, compliance scoring, and last-seen activity timestamps.
-- 📊 **Live Compliance Analytics**:
-  - Real-time statistics including total scans, total violations, gear-specific breakdown, and compliance percentage.
-- 📸 **Reference Image Capture Tool**:
-  - Built-in utility (`capture_references.py`) to capture and calibrate reference items for demo or custom gear scenarios.
+- ⚡ **Real-Time Optical PPE Detection** – Analyzes video frames every **0.5 seconds** with high accuracy and low latency.
+- 🔄 **Hybrid Detection Engine**:
+  - **Local PyTorch YOLOv8**: Instant, zero-cost, offline-capable PPE analysis with human upper-body tracking and HSV color extraction.
+  - **Google Gemini 1.5 Flash Vision**: Contextual reasoning fallback for complex lighting and desk testing scenarios.
+- 🦺 **Multi-Gear Compliance Verification**:
+  - **Safety Helmets / Hard Hats** (Yellow, Orange, White, Blue).
+  - **High-Visibility Safety Vests** (Neon Orange, Yellow, Lime-Green).
+- 📹 **Multi-Camera CCTV Matrix**:
+  - 6 sector surveillance feeds (Main Gate, Structural Tower, Machinery Bay, Excavation Pit, Logistics Depot, Fabrication Bay).
+  - Multi-webcam device enumeration via `navigator.mediaDevices.enumerateDevices()`.
+- 🗺️ **Interactive Site Blueprint Studio**:
+  - Drag-and-drop camera pin positioning across the site map with real-time coordinate persistence.
+  - Custom floorplan uploader (PNG, JPG, SVG, CAD exports) or high-contrast vector blueprint grid.
+- 🛡️ **Dynamic Safety Zone Protocol Builder (CRUD)**:
+  - Create, customize, and manage safety zones with customizable risk levels (*Critical*, *High*, *Medium*, *Low*) and mandatory PPE checklists.
+- 👷 **Workforce Roster & Safety Clearance**:
+  - Personnel registration with role classifications, assigned zones, emergency contacts, and clearance badges.
+  - Instant search, multi-field filtering, and **one-click CSV export**.
+- 📊 **Safety Analytics & Compliance Audit Reports**:
+  - Real-time violation incident timeline and instant **full JSON audit report download**.
+- 🔊 **Emergency PA Voice Broadcast System**:
+  - Site-wide voice announcements with preset emergency messages and custom Text-to-Speech playback (`pyttsx3` + Web Speech API).
 
 ---
 
@@ -53,18 +60,28 @@
 
 ```mermaid
 flowchart TD
-    A[Webcam / Video Stream] -->|Base64 Frames every 0.5s| B[Flask API Server]
-    B --> C{PyTorch YOLOv8 Available?}
-    C -->|Yes| D[Local YOLOv8 + HSV Color Extraction]
-    C -->|No / Exception| E[Google Gemini 1.5 Flash Vision API]
-    D --> F[Compliance Evaluation Engine]
-    E --> F
-    F -->|Compliant| G[Update Live Dashboard]
-    F -->|Violation Detected| H[Violation Handler]
-    H --> I[Store in violations.json]
-    H --> J[Increment Worker Violations]
-    H --> K[TTS Voice Announcement + Audible Alarm]
-    H --> L[Push Browser Notifications & Visual Alert]
+    subgraph Video Acquisition & Frontend
+        A[Webcam / CCTV Stream] --> B[Camera Device Selector]
+        B --> C[Manager CCTV Grid & Blueprint Studio]
+    end
+
+    subgraph Backend Processing
+        C -->|Frames @ 0.5s intervals| D[Flask Application Server]
+        D --> E{PyTorch YOLOv8 Available?}
+        E -->|Yes| F[YOLOv8 + HSV Color Segmentation]
+        E -->|No / Fallback| G[Google Gemini 1.5 Flash Vision API]
+        F --> H[PPE Compliance Rule Engine]
+        G --> H
+    end
+
+    subgraph Action & Notification
+        H -->|Compliant| I[Telemetry Update]
+        H -->|Violation Detected| J[Violation Dispatcher]
+        J --> K[JSON Database Persistence]
+        J --> L[Worker Violation Increment]
+        J --> M[pyttsx3 Offline TTS & Browser Speech]
+        J --> N[Live Alert HUD & Push Notifications]
+    end
 ```
 
 ---
@@ -73,15 +90,15 @@ flowchart TD
 
 - **Operating System**: Windows 10/11, macOS, or Linux
 - **Python**: Version `3.8` or higher (`3.10+` recommended)
-- **Camera**: Standard USB webcam or built-in laptop camera
-- **Audio Output**: Speakers or headphones for voice alerts
+- **Camera**: USB webcam, built-in laptop camera, or virtual camera feed
+- **Audio**: Speakers / headphones for voice announcements
 - **Google Gemini API Key** *(Optional, recommended for fallback mode)*: [Get free API key](https://aistudio.google.com/app/apikey)
 
 ---
 
 ## 🚀 Quick Start Installation
 
-### 1. Clone or Open the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/safcam.git
@@ -102,19 +119,18 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install Required Dependencies
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-*Key dependencies installed:*
-- `flask`, `flask-cors` – Web application framework
-- `torch`, `torchvision` – PyTorch deep learning backend
-- `ultralytics` – YOLOv8 object detection
-- `opencv-python`, `pillow`, `numpy` – Computer vision and image processing
-- `pyttsx3` – Offline Text-to-Speech voice engine
-- `google-generativeai`, `python-dotenv` – Gemini Vision integration
+*Key packages:*
+- `flask`, `flask-cors` – Backend web framework
+- `torch`, `torchvision`, `ultralytics` – PyTorch & YOLOv8 deep learning
+- `opencv-python`, `pillow`, `numpy` – Image processing & color detection
+- `pyttsx3`, `comtypes` – Offline Text-to-Speech engine
+- `google-generativeai`, `python-dotenv` – Gemini Vision cloud fallback
 
 ---
 
@@ -126,12 +142,12 @@ pip install -r requirements.txt
    cp .env.example .env
    ```
 
-2. **Configure API Keys in `.env`**:
+2. **Configure Settings in `.env`**:
    ```ini
    # Google Gemini Vision API Key (used as fallback or primary vision engine)
    GEMINI_API_KEY=your_gemini_api_key_here
 
-   # Optional keys for voice or TTS redundancy
+   # Optional keys for redundant TTS or testing
    GEMINI_API_KEY_1=your_first_key_here
    GEMINI_API_KEY_2=your_second_key_here
 
@@ -144,19 +160,20 @@ pip install -r requirements.txt
 
 ## 💻 Running SafCam
 
-Start the application server:
+Start the SafCam server:
 
 ```bash
 python app.py
 ```
 
-Upon startup, the console will output:
+Startup console output:
 ```text
 ✅ PyTorch detector initialized successfully
 ✅ Voice alert system initialized
 ✅ Worker management system loaded
 🚀 SafCam Server Starting...
 📊 Dashboard: http://localhost:5000
+🛡️ Manager Portal: http://localhost:5000/manager
 🔥 Detector: PyTorch (YOLOv8)
 🔑 Gemini Fallback: Available
 ```
@@ -165,89 +182,91 @@ Upon startup, the console will output:
 
 ## 🖥️ Dashboards & Portals
 
-### 1. Live Safety Monitor Dashboard
+### 1. Single-Feed Live Optical Monitor
 - **URL**: `http://localhost:5000/`
-- **Features**:
-  - Live video preview with start/stop monitoring controls.
-  - Active detection method badge (PyTorch / Gemini).
-  - Real-time statistics: Total Scans, Violations Count, Compliance Rate %.
-  - Live Alert Banner with audio chime when violations occur.
-  - Real-time violation history log with clear/purge option.
+- **Purpose**: Dedicated single-camera inspection station for entry gates or check-in desks.
+- **Features**: Live camera stream, real-time scan statistics, compliance scoring, and violation log with audio alerts.
 
-### 2. CCTV Operations & Workforce Manager Portal
-- **URL**: `http://localhost:5000/manager` (or `http://localhost:5000/manager.html`)
-- **Features**:
-  - **Multi-Camera CCTV Operations Grid**: 6 dedicated camera feeds covering all site sectors (Main Gate Check-in, Structural Framework, Heavy Machinery Bay, Excavation Pit, Logistics Depot, Fabrication Bay).
-  - **Master & Per-Camera Controls**: "Start All Feeds" / "Stop All Feeds" master buttons plus individual stream toggles.
-  - **Zone Safety Protocols & Risk Matrix**: Risk classification (Critical / High / Medium), required PPE checklist per zone, and live personnel distribution.
-  - **Site-Wide Emergency PA Broadcast**: Real-time voice announcement broadcast over site speakers (`POST /api/broadcast-alert`).
-  - **Workforce Registry**: Register personnel with Role/Classification, Assigned Safety Zone, Emergency Contact, and Safety Clearance badge.
-  - **Real-Time Search & Filters**: Instant keyword search by name or ID, role filter, and zone filter.
+### 2. Enterprise Manager Command Center
+- **URL**: `http://localhost:5000/manager`
+- **Tabs & Capabilities**:
+  1. **📹 CCTV Operations Matrix**: 6-camera monitoring grid with device selection dropdown (`#cameraDeviceSelect`), master stream toggles, and sector filtering.
+  2. **🗺️ Site Blueprint & Camera Map**: Drag-and-drop camera pin placement across the construction floorplan with coordinate persistence and custom CAD/floorplan image uploader.
+  3. **🛡️ Zone Safety Protocols**: Dynamic safety zone configurator to create, edit, or delete custom zones, risk classifications (*Critical / High / Medium / Low*), and required PPE checklists.
+  4. **👷 Workforce & Clearance**: Personnel directory, live keyword search, role and zone filtering, employee registration, and **CSV roster export**.
+  5. **📊 Safety Analytics & Reports**: Live incident timeline and **JSON site compliance audit report download**.
+  6. **📢 Site PA Voice Broadcast**: Emergency broadcast modal to trigger audio announcements across all site zones.
 
 ---
 
-## 🧪 Detection Modes & Calibration
+## 🧪 Detection Modes & Calibrations
 
-SafCam supports two operational modes:
+SafCam is designed to work in both production field environments and testing setups:
 
 ### A. Production Mode (Real Industrial PPE)
-- **Safety Helmet**: Detects standard industrial hard hats (Yellow, Orange, White).
-- **Safety Vest**: Detects standard retroreflective high-visibility vests (Neon Yellow, Orange, Lime Green).
-- Uses YOLOv8 person bounding boxes with HSV color space filtering.
+- **Hard Hat / Safety Helmet**: Detects standard industrial helmets (Yellow, White, Orange, Blue).
+- **High-Vis Safety Vest**: Detects standard retroreflective safety vests (Neon Yellow, Orange, Lime Green).
+- Utilizes YOLOv8 upper-body bounding boxes combined with adaptive HSV color masking.
 
-### B. Demonstration & Testing Mode (Desk Setup)
-- If you don't have hard hats at your desk, Gemini Vision mode recognizes:
-  - **Cap / Hat** on head $\rightarrow$ maps to Helmet compliance.
-  - **ID Card / Lanyard** around neck $\rightarrow$ maps to Vest compliance.
+### B. Desk Demonstration & Testing Mode
+- If testing from an office desk without real safety gear:
+  - Any **Hat / Cap** on the head $\rightarrow$ evaluated as Helmet compliant.
+  - Any **ID Card / Lanyard / Bright Garment** $\rightarrow$ evaluated as Vest compliant.
 
-### C. Reference Image Calibration Tool
-To calibrate specific caps or lanyards for testing:
+### C. Reference Image Calibration Utility
+To capture custom reference gear snapshots:
 ```bash
 python capture_references.py
 ```
-Follow the interactive webcam prompts to capture reference snapshots into `reference_images/`.
 
 ---
 
-## 📡 API Reference
+## 📡 REST API Reference
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/health` | Health status, active detector engine (`pytorch`/`gemini`), and voice alert readiness. |
-| `POST` | `/api/analyze-frame` | Analyzes a base64 frame payload `{ "image": "<base64>" }` and returns violation details. |
-| `GET` | `/api/violations` | Returns complete violation log history. |
-| `GET` | `/api/stats` | Returns real-time aggregate statistics (scans, violations, compliance %). |
-| `POST` | `/api/clear-violations` | Clears all violation log entries from persistent storage. |
-| `GET` | `/api/workers` | Retrieves list of all registered workers and worker stats. |
-| `POST` | `/api/workers` | Registers a new worker `{ "name": "...", "employee_id": "...", "role": "..." }`. |
-| `DELETE` | `/api/workers/<employee_id>` | Removes a registered worker by Employee ID. |
-| `GET` | `/manager` | Serves the Manager Dashboard web interface. |
+| `GET` | `/api/health` | Health check, active detector engine (`pytorch`/`gemini`), and TTS state. |
+| `POST` | `/api/analyze-frame` | Analyzes a base64 frame `{ "image": "<base64>" }` and returns compliance state. |
+| `GET` | `/api/zones` | Returns all configured safety zones and required PPE protocols. |
+| `POST` | `/api/zones` | Creates or updates a safety zone definition. |
+| `DELETE` | `/api/zones/<zone_id>` | Deletes a safety zone by ID. |
+| `GET` | `/api/site-map` | Retrieves saved blueprint map data and camera pin coordinates. |
+| `POST` | `/api/site-map` | Saves updated blueprint image and camera pin positions. |
+| `GET` | `/api/workers` | Retrieves registered workforce directory and zone stats. |
+| `POST` | `/api/workers` | Registers a new worker `{ "name": "...", "employee_id": "...", "zone": "..." }`. |
+| `DELETE` | `/api/workers/<employee_id>` | Deletes a worker profile. |
+| `GET` | `/api/violations` | Returns complete violation incident history. |
+| `GET` | `/api/stats` | Aggregate metrics (total scans, violations count, compliance %). |
+| `POST` | `/api/clear-violations` | Purges all logged violation entries. |
+| `POST` | `/api/broadcast-alert` | Triggers a site-wide PA voice broadcast message. |
+| `GET` | `/api/export-report` | Generates and exports the complete site compliance audit report in JSON. |
+| `GET` | `/manager` | Serves the Manager Command Center interface. |
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Directory Structure
 
 ```text
 safcam/
-├── app.py                  # Main Flask application and REST API endpoints
-├── detector.py             # PyTorch YOLOv8 detector & HSV color PPE analyzer
-├── voice_alerts.py         # Offline pyttsx3 Text-to-Speech & audible alarm system
-├── worker_manager.py       # Worker database CRUD operations and statistics
-├── capture_references.py   # Webcam utility to capture reference test images
-├── index.html              # Main Live Monitor dashboard UI
-├── script.js               # WebRTC camera capture and live frontend controller
-├── manager.html            # Worker Management dashboard UI
-├── manager.js              # Worker management CRUD frontend logic
-├── styles.css              # Glassmorphic dark theme design system
+├── app.py                  # Main Flask application and REST API routing
+├── detector.py             # PyTorch YOLOv8 detector & HSV color PPE analysis engine
+├── voice_alerts.py         # Offline pyttsx3 Text-to-Speech & voice dispatcher
+├── worker_manager.py       # Workforce, Zone, and Blueprint database management
+├── capture_references.py   # Interactive webcam calibration utility
+├── index.html              # Live Single-Feed Monitor UI
+├── script.js               # Frontend controller for Single Monitor
+├── manager.html            # Enterprise Manager Command Center UI
+├── manager.js              # Command Center controller (Tabs, CCTV, Blueprint, Zones, Roster)
+├── styles.css              # Obsidian Cyber dark theme & glassmorphic design system
 ├── requirements.txt        # Python dependency manifest
-├── yolov8n.pt              # YOLOv8 Nano pre-trained model weights
-├── workers.json            # Worker profiles persistent JSON storage
-├── violations.json         # Violation logs persistent JSON storage
-├── .env.example            # Sample environment variables configuration
+├── yolov8n.pt              # Pre-trained YOLOv8 nano model weights
+├── workers.json            # Persistent worker directory storage
+├── zones.json              # Persistent safety zones configuration storage
+├── site_map.json           # Persistent blueprint floorplan and camera pin storage
+├── violations.json         # Persistent violation logs storage
+├── .env.example            # Environment variables template
 ├── .gitignore              # Git ignore rules
-├── QUICKSTART.md           # Quick start tutorial
-├── PYTORCH_SETUP.md        # PyTorch & YOLO installation deep dive
-└── VOICE_WORKER_SETUP.md   # Voice alerts and worker setup notes
+└── README.md               # Project documentation and guide
 ```
 
 ---
@@ -255,23 +274,15 @@ safcam/
 ## 🔧 Troubleshooting
 
 ### 1. PyTorch / YOLOv8 Checkpoint Loading Issue
-- **Issue**: `WeightsUnpickler error: Unsupported global ... weights_only`
-- **Solution**: SafCam includes an automated compatibility patch for PyTorch 2.6+ in `detector.py`. Ensure you run `python app.py` with the updated files.
+- **Symptom**: `WeightsUnpickler error: Unsupported global ... weights_only`
+- **Solution**: SafCam includes a built-in unpickler patch for PyTorch 2.6+ in `detector.py`. Ensure you run with the provided codebase.
 
-### 2. Camera Access Blocked
-- Ensure browser permissions allow camera access on `http://localhost:5000`.
-- In Chrome, navigate to `chrome://settings/content/camera` and enable permissions.
-- Make sure no other program (Zoom, Teams, etc.) is locking the webcam.
+### 2. Camera Access / Permissions
+- Allow camera access when prompted by the browser on `http://localhost:5000`.
+- If using multiple webcams, use the **Select Video Device** dropdown in the CCTV Operations tab to switch feeds.
 
-### 3. Voice Alerts Not Speaking
-- On Windows, verify that system sound is unmuted and the default audio device is configured.
-- If running in headless Linux environments, install `espeak`: `sudo apt-get install espeak`.
-
-### 4. GPU Acceleration (CUDA)
-- By default, PyTorch runs efficiently on CPU (~0.2–0.4s inference). For dedicated NVIDIA GPUs:
-  ```bash
-  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-  ```
+### 3. Voice Alerts in Windows / Background Threads
+- Windows COM threading is handled via `pythoncom.CoInitialize()` in `voice_alerts.py` with browser Web Speech API (`window.speechSynthesis`) fallback.
 
 ---
 

@@ -1,0 +1,54 @@
+{
+  "map_image": null,
+  "pins": [
+    {
+      "id": "cam1",
+      "name": "CAM-01 (Main Gate)",
+      "zone": "Zone A",
+      "x": 18.5,
+      "y": 82.0,
+      "status": "active"
+    },
+    {
+      "id": "cam2",
+      "name": "CAM-02 (Tower Scaffolding)",
+      "zone": "Zone A",
+      "x": 35.0,
+      "y": 28.0,
+      "status": "active"
+    },
+    {
+      "id": "cam3",
+      "name": "CAM-03 (Machinery Bay)",
+      "zone": "Zone B",
+      "x": 68.0,
+      "y": 32.0,
+      "status": "active"
+    },
+    {
+      "id": "cam4",
+      "name": "CAM-04 (Excavation Pit)",
+      "zone": "Zone C",
+      "x": 78.0,
+      "y": 72.0,
+      "status": "active"
+    },
+    {
+      "id": "cam5",
+      "name": "CAM-05 (Logistics Depot)",
+      "zone": "Zone D",
+      "x": 42.0,
+      "y": 75.0,
+      "status": "active"
+    },
+    {
+      "id": "cam6",
+      "name": "CAM-06 (Fabrication Bay)",
+      "zone": "Zone E",
+      "x": 22.0,
+      "y": 45.0,
+      "status": "active"
+    }
+  ],
+  "updated_at": "2026-10-08T22:10:04.442266"
+}

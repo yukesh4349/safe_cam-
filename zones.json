@@ -1,0 +1,88 @@
+[
+  {
+    "id": "zone-a",
+    "name": "Zone A - Structural Framework",
+    "code": "SEC-A1",
+    "description": "Main Tower, Core Columns & Scaffolding",
+    "risk_level": "High",
+    "required_ppe": [
+      "Safety Helmet",
+      "High-Vis Vest",
+      "Safety Boots"
+    ],
+    "assigned_cameras": [
+      "CAM-01",
+      "CAM-02"
+    ],
+    "max_capacity": 30,
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "id": "zone-b",
+    "name": "Zone B - Heavy Machinery Bay",
+    "code": "SEC-B2",
+    "description": "Tower Crane, Excavator Lane & Concrete Pump",
+    "risk_level": "Critical",
+    "required_ppe": [
+      "Safety Helmet",
+      "High-Vis Vest",
+      "Ear Protection"
+    ],
+    "assigned_cameras": [
+      "CAM-03"
+    ],
+    "max_capacity": 15,
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "id": "zone-c",
+    "name": "Zone C - Excavation Pit",
+    "code": "SEC-C3",
+    "description": "Deep Basement Trench & Shoring Wall",
+    "risk_level": "High",
+    "required_ppe": [
+      "Safety Helmet",
+      "High-Vis Vest",
+      "Full Body Harness"
+    ],
+    "assigned_cameras": [
+      "CAM-04"
+    ],
+    "max_capacity": 20,
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "id": "zone-d",
+    "name": "Zone D - Logistics & Storage",
+    "code": "SEC-D4",
+    "description": "Rebar, Steel Stockpile & Unloading Depot",
+    "risk_level": "Medium",
+    "required_ppe": [
+      "Safety Helmet",
+      "High-Vis Vest",
+      "Work Gloves"
+    ],
+    "assigned_cameras": [
+      "CAM-05"
+    ],
+    "max_capacity": 40,
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "id": "zone-e",
+    "name": "Zone E - Workshop & Fabrication",
+    "code": "SEC-E5",
+    "description": "Welding Bays, Cutting Station & Assembly",
+    "risk_level": "Medium",
+    "required_ppe": [
+      "Eye Goggles",
+      "Safety Helmet",
+      "Heat Gloves"
+    ],
+    "assigned_cameras": [
+      "CAM-06"
+    ],
+    "max_capacity": 25,
+    "created_at": "2026-01-01T00:00:00"
+  }
+]

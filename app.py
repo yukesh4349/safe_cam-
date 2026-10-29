@@ -15,16 +15,24 @@ load_dotenv()
 app = Flask(__name__, static_folder='.')
 CORS(app)
 
+import time
+
 # Configure Gemini API (fallback)
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 GEMINI_API_KEY_1 = os.getenv('GEMINI_API_KEY_1', '')
 GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2', '')
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+if GEMINI_API_KEY and not GEMINI_API_KEY.startswith('your_'):
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+    except Exception as e:
+        print(f"⚠️ Gemini configuration warning: {e}")
+        model = None
 else:
     model = None
+
+last_violation_time = 0
 
 # Initialize PyTorch detector
 # Note: PyTorch YOLOv8 is trained on REAL safety helmets and vests
@@ -105,6 +113,15 @@ def analyze_frame():
         image_bytes = base64.b64decode(image_data)
         image = Image.open(io.BytesIO(image_bytes))
         
+        # Periodic garbage collection to maintain lean memory
+        global frame_counter
+        if 'frame_counter' not in globals():
+            frame_counter = 0
+        frame_counter += 1
+        if frame_counter % 30 == 0:
+            import gc
+            gc.collect()
+
         # Try PyTorch detector first
         if USE_PYTORCH and pytorch_detector:
             try:
@@ -118,6 +135,7 @@ def analyze_frame():
                 result = analyze_image(image_bgr)
                 print(f"🔥 PyTorch Detection: {result}")
                 
+                del image_np, image_bgr
             except Exception as e:
                 print(f"PyTorch detection failed: {e}, falling back to Gemini")
                 result = None
@@ -232,40 +250,44 @@ BE STRICT: If you don't clearly see both items worn by the person, report violat
                     'summary': 'Unable to parse AI response'
                 }
 
-        # Log violations if detected
+        # Log violations if detected (with a 3-second cooldown to prevent log flooding)
+        global last_violation_time
+        now_ts = time.time()
         if result.get('compliance_status') == 'violation' and result.get('violations'):
-            violations = load_violations()
-            
-            # Get worker name from request (if provided)
-            worker_id = data.get('worker_id', None)
-            worker_name = 'Unknown Worker'
-            
-            if worker_id and worker_manager:
-                worker = worker_manager.get_worker_by_id(worker_id)
-                if worker:
-                    worker_name = worker['name']
-                    worker_manager.update_worker_violation(worker_id)
-            
-            violation_entry = {
-                'timestamp': datetime.now().isoformat(),
-                'violations': result['violations'],
-                'workers_detected': result.get('workers_detected', 0),
-                'summary': result.get('summary', ''),
-                'worker_name': worker_name,
-                'worker_id': worker_id,
-                'image': f"data:image/jpeg;base64,{image_data[:1000]}"  # Store thumbnail
-            }
-            violations.append(violation_entry)
-            
-            # Keep only last 100 violations
-            if len(violations) > 100:
-                violations = violations[-100:]
-            
-            save_violations(violations)
-            
-            # Trigger voice alert
-            if announce_violation:
-                announce_violation(worker_name, result['violations'])
+            if (now_ts - last_violation_time) >= 3.0:
+                last_violation_time = now_ts
+                violations = load_violations()
+                
+                # Get worker name from request (if provided)
+                worker_id = data.get('worker_id', None)
+                worker_name = 'Unknown Worker'
+                
+                if worker_id and worker_manager:
+                    worker = worker_manager.get_worker_by_id(worker_id)
+                    if worker:
+                        worker_name = worker['name']
+                        worker_manager.update_worker_violation(worker_id)
+                
+                violation_entry = {
+                    'timestamp': datetime.now().isoformat(),
+                    'violations': result['violations'],
+                    'workers_detected': result.get('workers_detected', 0),
+                    'summary': result.get('summary', ''),
+                    'worker_name': worker_name,
+                    'worker_id': worker_id,
+                    'image': f"data:image/jpeg;base64,{image_data[:1000]}"  # Store thumbnail
+                }
+                violations.append(violation_entry)
+                
+                # Keep only last 100 violations
+                if len(violations) > 100:
+                    violations = violations[-100:]
+                
+                save_violations(violations)
+                
+                # Trigger voice alert
+                if announce_violation:
+                    announce_violation(worker_name, result['violations'])
 
         return jsonify({
             'status': 'success',
@@ -444,6 +466,107 @@ def broadcast_alert():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# --- ZONE MANAGEMENT ENDPOINTS ---
+@app.route('/api/zones', methods=['GET'])
+def get_zones_endpoint():
+    """Get all safety zones"""
+    if not worker_manager:
+        return jsonify({'error': 'Worker/Zone manager not available'}), 500
+    try:
+        zones = worker_manager.load_zones()
+        return jsonify({
+            'status': 'success',
+            'zones': zones
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/zones', methods=['POST'])
+def save_zone_endpoint():
+    """Add or update a safety zone"""
+    if not worker_manager:
+        return jsonify({'error': 'Worker/Zone manager not available'}), 500
+    try:
+        data = request.json
+        if not data or not data.get('name'):
+            return jsonify({'error': 'Zone name is required'}), 400
+        saved_zone = worker_manager.add_or_update_zone(data)
+        return jsonify({
+            'status': 'success',
+            'zone': saved_zone
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/zones/<zone_id>', methods=['DELETE'])
+def delete_zone_endpoint(zone_id):
+    """Delete a safety zone"""
+    if not worker_manager:
+        return jsonify({'error': 'Worker/Zone manager not available'}), 500
+    try:
+        worker_manager.delete_zone(zone_id)
+        return jsonify({
+            'status': 'success',
+            'message': 'Zone deleted'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- SITE MAP & BLUEPRINT ENDPOINTS ---
+@app.route('/api/site-map', methods=['GET'])
+def get_site_map_endpoint():
+    """Get site map data and camera pin positions"""
+    if not worker_manager:
+        return jsonify({'error': 'Site map manager not available'}), 500
+    try:
+        site_map = worker_manager.load_site_map()
+        return jsonify({
+            'status': 'success',
+            'site_map': site_map
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/site-map', methods=['POST'])
+def save_site_map_endpoint():
+    """Save site map data (pins and/or uploaded floorplan map)"""
+    if not worker_manager:
+        return jsonify({'error': 'Site map manager not available'}), 500
+    try:
+        data = request.json or {}
+        worker_manager.save_site_map(data)
+        return jsonify({
+            'status': 'success',
+            'message': 'Site map updated successfully'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- COMPLIANCE REPORT EXPORT ---
+@app.route('/api/export-report', methods=['GET'])
+def export_report_endpoint():
+    """Export complete site compliance report data"""
+    try:
+        violations = load_violations()
+        workers = worker_manager.get_all_workers() if worker_manager else []
+        zones = worker_manager.load_zones() if worker_manager else []
+        stats = worker_manager.get_worker_stats() if worker_manager else {}
+        
+        return jsonify({
+            'status': 'success',
+            'generated_at': datetime.now().isoformat(),
+            'site_summary': {
+                'total_workers': len(workers),
+                'total_zones': len(zones),
+                'total_violations_recorded': len(violations)
+            },
+            'zones': zones,
+            'workers': workers,
+            'violations': violations
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/manager')
 def manager_dashboard():
     """Serve manager dashboard"""
@@ -452,6 +575,7 @@ def manager_dashboard():
 if __name__ == '__main__':
     print("🚀 SafCam Server Starting...")
     print(f"📊 Dashboard: http://localhost:5000")
+    print(f"🛡️ Manager Portal: http://localhost:5000/manager")
     print(f"🔥 Detector: {'PyTorch (YOLOv8)' if USE_PYTORCH else 'Gemini API'}")
     print(f"🔑 Gemini Fallback: {'Available' if GEMINI_API_KEY else 'Not configured'}")
     app.run(debug=True, host='0.0.0.0', port=5000)
